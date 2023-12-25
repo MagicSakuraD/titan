@@ -2,6 +2,14 @@
 import { createRoot } from "react-dom/client";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import {
+  MeshWobbleMaterial,
+  useGLTF,
+  CameraControls,
+  Environment,
+} from "@react-three/drei";
 import { useRef } from "react";
 import { Mesh } from "three/src/Three.js";
 import { useState, useEffect } from "react";
@@ -12,13 +20,29 @@ const Fiber = () => {
   function Scene() {
     const mesh = useRef<Mesh>(null!);
     const gltf = useLoader(GLTFLoader, "/model/shiba/scene.gltf");
-    useFrame(() => {
-      mesh.current.rotation.y += 0.01;
-    });
+    // const obj = useLoader(OBJLoader, "/model/girl/girl2.fbx");
+    // useFrame(() => {
+    //   mesh.current.rotation.y += 0.01;
+    // });
     return (
-      <mesh ref={mesh}>
+      <mesh ref={mesh} scale={1 / 2}>
+        {/* <primitive object={obj} position={[-5, 0, 0]} /> */}
         <primitive object={gltf.scene} />
       </mesh>
+    );
+  }
+
+  function Level() {
+    const { nodes } = useGLTF("/model/draco/level-react-draco.glb");
+    const levelMesh = nodes.Level as Mesh;
+    return (
+      <mesh
+        geometry={levelMesh.geometry}
+        material={levelMesh.material}
+        position={[-1, 0.6, 0]}
+        rotation={[Math.PI / 2, -Math.PI / 9, 0]}
+        scale={2}
+      />
     );
   }
   function FullscreenButton() {
@@ -70,8 +94,12 @@ const Fiber = () => {
       <Canvas>
         <OrbitControls />
         <ambientLight intensity={0.1} />
-        <directionalLight color="" position={[0, 0, 5]} />
-        <Scene />
+        <directionalLight color="#34d399" position={[0, 0, 5]} />
+        <group>
+          <Level />
+          <Scene />
+        </group>
+        {/* <Environment preset="city" background blur={1} /> */}
       </Canvas>
       <FullscreenButton />
     </div>

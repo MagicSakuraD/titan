@@ -8,12 +8,25 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
+      // backgroundImage: {
+      //   "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+      //   "gradient-conic":
+      //     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      // },
     },
+  },
+  daisyui: {
+    themes: [
+      "light",
+      "dark",
+      "cupcake",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "aqua",
+      "winter",
+      "synthwave",
+    ],
   },
   plugins: [require("daisyui")],
 };

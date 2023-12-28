@@ -7,13 +7,13 @@ const Navbar = () => {
       <div className="navbar bg-base-100">
         <div className="flex-1">
           <Link className="btn btn-ghost text-xl" href={"/"}>
-            Home
+            K423
           </Link>
         </div>
         <div className="flex flex-row gap-4">
           <div className="dropdown ">
             <div tabIndex={0} role="button" className="btn m-1">
-              Theme
+              皮肤
               <svg
                 width="12px"
                 height="12px"

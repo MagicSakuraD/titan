@@ -14,8 +14,14 @@ import { useRef } from "react";
 import { Mesh } from "three/src/Three.js";
 import { useState, useEffect } from "react";
 import { OrbitControls } from "@react-three/drei";
+import { motion } from "framer-motion-3d";
 
 const Fiber = () => {
+  const variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
   const screenRef = useRef<HTMLDivElement>(null!);
   function Scene() {
     const mesh = useRef<Mesh>(null!);
@@ -95,6 +101,7 @@ const Fiber = () => {
         <OrbitControls />
         <ambientLight intensity={0.1} />
         <directionalLight color="#34d399" position={[0, 0, 5]} />
+
         <group>
           <Level />
           <Scene />

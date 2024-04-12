@@ -6,6 +6,9 @@ import { motion, MotionConfig, useMotionValue } from "framer-motion";
 import { Shapes } from "./Shapes";
 import { transition } from "./setting";
 import useMeasure from "react-use-measure";
+import { useLoader } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 const MotionPage = () => {
   const [ref, bounds] = useMeasure({ scroll: false });
@@ -73,7 +76,7 @@ const MotionPage = () => {
             variants={{ hover: { scale: 0.85 }, press: { scale: 1.1 } }}
             className="label flex justify-center items-center"
           >
-            <p> play</p>
+            <p>play</p>
           </motion.div>
         </motion.button>
       </MotionConfig>

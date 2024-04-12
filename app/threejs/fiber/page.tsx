@@ -26,13 +26,9 @@ const Fiber = () => {
   function Scene() {
     const mesh = useRef<Mesh>(null!);
     const gltf = useLoader(GLTFLoader, "/model/shiba/scene.gltf");
-    // const obj = useLoader(OBJLoader, "/model/girl/girl2.fbx");
-    // useFrame(() => {
-    //   mesh.current.rotation.y += 0.01;
-    // });
+
     return (
       <mesh ref={mesh} scale={1 / 2}>
-        {/* <primitive object={obj} position={[-5, 0, 0]} /> */}
         <primitive object={gltf.scene} />
       </mesh>
     );

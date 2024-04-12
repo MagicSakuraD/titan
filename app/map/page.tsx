@@ -12,34 +12,18 @@ import {
   useMapEvent,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
+import { div } from "three/examples/jsm/nodes/Nodes.js";
+
+const DynamicMapPage = dynamic(() => import("./DynamicMapPage"), {
+  ssr: false, // 禁用服务器端渲染
+});
 
 const MapPage = () => {
-  const position: [number, number] = [31.005, 125.021];
   return (
-    <main className="container mx-auto">
-      {/* <div className="w-96 h-96 m-5 bg-current opacity-30"></div> */}
-      <div className="card bg-base-100 shadow-xl glass">
-        {" "}
-        <div>
-          <MapContainer
-            center={position}
-            zoom={13}
-            scrollWheelZoom={true}
-            className="h-[35rem] rounded-lg"
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={position}>
-              <Popup>
-                纬度: {position[0]}, 经度: {position[1]}
-              </Popup>
-            </Marker>
-          </MapContainer>
-        </div>
-      </div>
-    </main>
+    <div>
+      <DynamicMapPage />
+    </div>
   );
 };
 

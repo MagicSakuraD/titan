@@ -4,13 +4,23 @@ import { useRef, useLayoutEffect } from "react";
 import { transition } from "./setting";
 import { Canvas, useThree } from "@react-three/fiber";
 import { useSmoothTransform } from "./use-smooth-transform";
+import { useLoader } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 
 export function Shapes({ isHover, isPress, mouseX, mouseY }) {
   const lightRotateX = useSmoothTransform(mouseY, spring, mouseToLightRotation);
   const lightRotateY = useSmoothTransform(mouseX, spring, mouseToLightRotation);
 
   return (
-    <Canvas shadows dpr={[1, 2]} resize={{ scroll: false, offsetSize: true }}>
+    <Canvas
+      shadows
+      dpr={[1, 2]}
+      resize={{ scroll: false, offsetSize: true }}
+      className="w-1/2"
+    >
+      <ambientLight intensity={0.1} />
+      <directionalLight color="" position={[0, 0, 5]} />
+
       <Camera mouseX={mouseX} mouseY={mouseY} />
       <MotionConfig transition={transition}>
         <motion.group
@@ -35,6 +45,12 @@ export function Shapes({ isHover, isPress, mouseX, mouseY }) {
       </MotionConfig>
     </Canvas>
   );
+}
+
+function Titan() {
+  const titan = useGLTF("/model/girl/girl3.glb");
+
+  return <primitive object={titan.scene} />;
 }
 
 export function Lights() {
@@ -84,6 +100,7 @@ export function Torus() {
     <motion.mesh
       position={[0.1, 0.4, 0]}
       rotation={[-0.5, 0.5, 0]}
+      scale={[0.1, 0.1, 0.1]} // 添加这一行
       variants={{
         hover: {
           y: 0.5,
@@ -92,7 +109,8 @@ export function Torus() {
         },
       }}
     >
-      <torusGeometry args={[0.2, 0.1, 10, 50]} />
+      {/* <boxGeometry args={[0.2, 0.1, 10, 50]} /> */}
+      <Titan />
       <Material />
     </motion.mesh>
   );

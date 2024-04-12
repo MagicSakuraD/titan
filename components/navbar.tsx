@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from 'next/image'
 
 const Navbar = () => {
   return (
@@ -13,7 +14,7 @@ const Navbar = () => {
         <div className="flex flex-row gap-4">
           <div className="dropdown ">
             <div tabIndex={0} role="button" className="btn m-1">
-              皮肤
+              主题
               <svg
                 width="12px"
                 height="12px"
@@ -100,7 +101,7 @@ const Navbar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-                <img
+                <Image
                   alt="Tailwind CSS Navbar component"
                   src="/img/avatar.jpg"
                 />

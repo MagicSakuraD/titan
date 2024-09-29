@@ -105,7 +105,7 @@ export default function Home() {
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            just try it out, it's free!
+            just try it out
           </p>
         </Link>
       </div>

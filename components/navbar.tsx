@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import Image from 'next/image'
+import Image from "next/image";
 
 const Navbar = () => {
   return (
@@ -104,6 +104,8 @@ const Navbar = () => {
                 <Image
                   alt="Tailwind CSS Navbar component"
                   src="/img/avatar.jpg"
+                  width={40}
+                  height={40}
                 />
               </div>
             </div>

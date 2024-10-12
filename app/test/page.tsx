@@ -3,123 +3,142 @@ import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import ModuleOpenDrive from "@/public/lib/ModuleOpenDrive";
 
-// OpenDRIVE (XODR) 数据示例，形成 T 形状的道路
-const xodrData = `
-<?xml version="1.0" encoding="UTF-8"?>
-<OpenDRIVE>
-    <road name="T-Shape Road" length="50" id="0" junction="-1">
-        <lanes>
-            <laneSection s="0">
-                <left>
-                    <lane id="3" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                    <lane id="2" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                    <lane id="1" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                </left>
-                <center>
-                    <lane id="0" type="none">
-                        <roadMark sOffset="0" type="solid" color="yellow"/>
-                    </lane>
-                </center>
-                <right>
-                    <lane id="-1" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                </right>
-            </laneSection>
-            <laneSection s="25">
-                <left>
-                    <lane id="4" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                    <lane id="5" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                </left>
-                <right>
-                    <lane id="-2" type="driving">
-                        <width sOffset="0" a="3.5"/>
-                    </lane>
-                </right>
-            </laneSection>
-        </lanes>
-    </road>
-</OpenDRIVE>
-`;
-
-// 解析 OpenDRIVE 数据的函数
-const parseOpenDRIVE = (xmlString: string) => {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-  const lanes = xmlDoc.querySelectorAll("lane");
-
-  return Array.from(lanes).map((lane, index) => ({
-    id: parseInt(lane.getAttribute("id") || "0"),
-    width: parseFloat(lane.querySelector("width")?.getAttribute("a") || "0"),
-    position: new THREE.Vector3(
-      index < 3 ? (index - 1) * 3.5 : 0, // 车道的横向位置
-      0,
-      index < 3 ? 0 : 25 // 前三条车道在主路，后面的在交叉路口
-    ),
-  }));
-};
-
-interface LaneProps {
-  position: THREE.Vector3;
-  width: number;
-  length: number;
-}
-
-const Lane: React.FC<LaneProps> = ({ position, width, length }) => {
-  const geometry = new THREE.BoxGeometry(width, 0.2, length);
-  const material = new THREE.MeshPhongMaterial({ color: "red" });
-  return <mesh geometry={geometry} material={material} position={position} />;
-};
-
+// Define Lane interface
 interface Lane {
   id: number;
   width: number;
   position: THREE.Vector3;
+  length: number;
+  rotation: THREE.Euler;
 }
 
-const RoadNetwork: React.FC<{ lanes: Lane[] }> = ({ lanes }) => {
+// Define RoadNetworkProps interface
+interface RoadNetworkProps {
+  lanes: Lane[];
+}
+
+// Define LaneProps interface
+interface LaneProps {
+  position: THREE.Vector3;
+  width: number;
+  length: number;
+  rotation: THREE.Euler;
+}
+
+// Lane component
+const LaneComponent: React.FC<LaneProps> = ({
+  position,
+  width,
+  length,
+  rotation,
+}) => {
+  const laneGeometry = new THREE.BoxGeometry(width, 0.1, length);
+  const laneMaterial = new THREE.MeshStandardMaterial({
+    color: "#808080",
+    transparent: true,
+    opacity: 0.7,
+  });
+
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh geometry={laneGeometry} material={laneMaterial} />
+    </group>
+  );
+};
+
+// RoadNetwork component
+const RoadNetwork: React.FC<RoadNetworkProps> = ({ lanes }) => {
   return (
     <>
       {lanes.map((lane, index) => (
-        <Lane
+        <LaneComponent
           key={index}
           position={lane.position}
           width={lane.width}
-          length={index < 3 ? 50 : 10} // 主路长度和交叉路口长度
+          length={lane.length}
+          rotation={lane.rotation}
         />
       ))}
     </>
   );
 };
 
-const MapPage = () => {
+// MapPage component
+const MapPage: React.FC = () => {
   const [lanes, setLanes] = useState<Lane[]>([]);
 
   useEffect(() => {
-    const parsedLanes = parseOpenDRIVE(xodrData);
-    setLanes(parsedLanes);
+    const loadModule = async () => {
+      try {
+        // Initialize the module
+        const Module = await ModuleOpenDrive({
+          locateFile: (path: string, prefix: string) => {
+            if (path.endsWith(".wasm")) {
+              return `/lib/${path}`;
+            }
+            return prefix + path;
+          },
+        });
+        let OpenDriveMap: any;
+
+        const loadFile = (file_text: string, clear_map: boolean) => {
+          if (clear_map) {
+            Module.FS_unlink("./data.xodr");
+          }
+
+          // Create a data file from the provided text
+          Module.FS_createDataFile(".", "data.xodr", file_text, true, true);
+
+          if (OpenDriveMap) {
+            OpenDriveMap.delete();
+          }
+
+          OpenDriveMap = new Module.OpenDriveMap("./data.xodr", {
+            with_lateralProfile: true,
+            with_laneHeight: true,
+            with_road_objects: false,
+            center_map: true,
+            abs_z_for_for_local_road_obj_outline: true,
+          });
+
+          loadOdrMap(clear_map);
+        };
+
+        const loadOdrMap = (clear_map: boolean) => {
+          // Implement the logic to parse lanes and update the state
+          const parsedLanes: Lane[] = []; // Implement lane parsing logic here
+          console.log("Parsed lanes:", parsedLanes);
+          setLanes(parsedLanes);
+        };
+
+        // Load the local XODR file directly
+        const response = await fetch("/map/try.xodr");
+        const xodrContent = await response.text();
+
+        // Call loadFile with the local XODR content
+        loadFile(xodrContent, false);
+      } catch (error) {
+        console.error("Error loading or parsing the XODR file:", error);
+      }
+    };
+
+    loadModule();
   }, []);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <Canvas>
+      <Canvas camera={{ position: [0, 50, 50], fov: 45 }}>
         <ambientLight intensity={0.5} />
-        <directionalLight color="red" position={[0, 10, 5]} />
+        <directionalLight
+          color="#ffffff"
+          position={[10, 10, 5]}
+          intensity={0.8}
+        />
         <RoadNetwork lanes={lanes} />
         <OrbitControls />
-        <gridHelper args={[200, 20]} rotation={[Math.PI / 2, 0, 0]} />
-        <axesHelper args={[5]} />
+        <gridHelper args={[200, 20]} />
       </Canvas>
     </div>
   );
